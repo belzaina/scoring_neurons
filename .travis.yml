@@ -1,0 +1,37 @@
+dist: xenial
+sudo: false
+latex: false
+
+language: r
+
+r: 
+  - release
+
+r_packages:
+  - rsconnect
+  - shiny
+  - shinydashboard
+  - readxl
+  - magrittr
+  - dplyr
+  - tidyr
+  - summarytools
+  - ROCR
+  - purrr
+  - e1071
+  - glmnet
+  - randomForest
+  - fastDummies
+
+apt_packages:
+  - libgdal-dev
+  - libudunits2-dev
+  - libmagick++-dev
+
+warnings_are_errors: false
+
+cache:
+  packages: true
+
+script:
+  - R -f deploy.R
