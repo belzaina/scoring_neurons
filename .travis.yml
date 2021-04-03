@@ -11,6 +11,8 @@ r_packages:
   - rsconnect
   - shiny
   - shinydashboard
+  - DT
+  - ggplot2
   - readxl
   - magrittr
   - dplyr
