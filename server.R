@@ -10,6 +10,7 @@ source("scripts/compute_evaluation_criteria.R")
 source("scripts/random_forest.R")
 source("scripts/svm.R")
 source("scripts/decision_tree.R")
+source("scripts/gradient_boosting.R")
 
 
 #' Load Clean Credit Dataset
@@ -769,6 +770,207 @@ server <- function(input, output) {
                     renderPlot(
                         
                         var_ranks %>%
+                            dplyr::mutate(
+                                
+                                Predictor = factor(Predictor, levels = Predictor[order(Importance)])
+                                
+                            ) %>%
+                            ggplot(aes(x = Predictor, y = Importance)) +
+                            geom_bar(stat = "identity", fill = "#f68060", alpha = .6, width = .4) +
+                            coord_flip() +
+                            xlab("") +
+                            ylab("PREDICTOR IMPORTANCE") +
+                            theme_bw()
+                        
+                    )
+                    
+                ),
+                
+                box(
+                    
+                    title = "PREDICTORS IMPORTANCE - SORTED BY THE IMPORTANCE METRIC",
+                    
+                    width = 6,
+                    
+                    height = "467px",
+                    
+                    br(),
+                    
+                    DT::renderDataTable(
+                        
+                        var_ranks,
+                        
+                        class = "display nowrap",
+                        
+                        rownames= FALSE,
+                        
+                        options = list(
+                            
+                            scrollX = TRUE,
+                            pageLength = 5
+                            
+                        )
+                        
+                    )
+                    
+                )
+                
+            ),
+            
+            fluidRow(
+                
+                column(
+                    
+                    width = 12,
+                    
+                    align = "center",
+                    
+                    h3("TRAIN AGAIN?"),
+                    
+                    br()
+                    
+                )
+                
+            )
+            
+        )
+        
+    })
+    
+    gb_results <- eventReactive(input$gb_train_button, {
+        
+        showModal(modalDialog("It takes a while to boost trees performance...", 
+                              footer = icon("tree")))
+        
+        # Prepare Train & Test Sets
+        n_train   <- round(n_rows * input$gb_fraction_train)
+        set.seed(input$gb_seed)
+        i_train   <- sample(1:n_rows, size = n_train)
+        train_set <- credit_dataset_modeling[i_train, ]
+        test_set  <- credit_dataset_modeling[-i_train, ]
+        
+        results <- gradient_boosting(train_set, test_set, n_rounds = input$gb_nrounds,
+                                     early_stopping_rounds = input$gb_early_stop, 
+                                     n_fold = input$gb_nfolds, random_seed = input$gb_seed,
+                                     var_importance_measure = input$gb_var_imp)
+        
+        eval_metrics <- compute_evaluation_criteria(
+            test_set$DEFAULT %>% as.character() %>% as.numeric(), 
+            results[['Predicted_Y_Test_Prob']], 
+            results[['Predicted_Y_Test_Class']]
+        )
+        
+        removeModal()
+        
+        list(
+            
+            "eval_metrics" = eval_metrics,
+            
+            "optim_ntree" = results[["opt_niters"]],
+            
+            "var_ranks" = results[["var_ranks"]]
+            
+        )
+        
+    })
+    
+    output$gb_eval_metrics <- renderUI({
+        
+        eval_metrics <- gb_results()[["eval_metrics"]] %>% round(4)
+        
+        fluidRow(
+            
+            box(
+                
+                title = "TEST SET RESULTS",
+                
+                width = 12,
+                
+                valueBox(
+                    
+                    value    = eval_metrics$AUC,
+                    subtitle = "Area under the ROC Curve (AUC)",
+                    icon     = icon("chart-area"),
+                    width    = 4,
+                    color    = "blue"
+                    
+                ),
+                
+                valueBox(
+                    
+                    value    = eval_metrics$GINI,
+                    subtitle = "GINI",
+                    icon     = icon("goodreads-g"),
+                    width    = 4,
+                    color    = "blue"
+                    
+                ),
+                
+                valueBox(
+                    
+                    value    = eval_metrics$PCC,
+                    subtitle = "Percent of Correct Classifcation (PCC)",
+                    icon     = icon("product-hunt"),
+                    width    = 4,
+                    color    = "blue"
+                    
+                ),
+                
+                valueBox(
+                    
+                    value    = eval_metrics$BS,
+                    subtitle = "Brier Score (BS)",
+                    icon     = icon("bold"),
+                    width    = 4,
+                    color    = "blue"
+                    
+                ),
+                
+                valueBox(
+                    
+                    value    = eval_metrics$KS,
+                    subtitle = "Kolmogorov-Smirnov Statistic (KS)",
+                    icon     = icon("kickstarter-k"),
+                    width    = 4,
+                    color    = "blue"
+                    
+                ),
+                
+                valueBox(
+                    
+                    value    = gb_results()[["optim_ntree"]],
+                    subtitle = "Optimal Number of Iterations (Trees)",
+                    icon     = icon("tree"),
+                    width    = 4,
+                    color    = "blue"
+                    
+                )
+                
+            )
+            
+        )
+        
+    })
+    
+    output$gb_var_imp <- renderUI({
+        
+        var_ranks <- gb_results()[["var_ranks"]] %>%
+            dplyr::mutate_if(is.numeric, round, 4)
+        
+        div(
+            
+            fluidRow(
+                
+                box(
+                    
+                    title = "TOP-10 PREDICTORS",
+                    
+                    width = 6,
+                    
+                    renderPlot(
+                        
+                        var_ranks %>%
+                            head(n = 10) %>%
                             dplyr::mutate(
                                 
                                 Predictor = factor(Predictor, levels = Predictor[order(Importance)])

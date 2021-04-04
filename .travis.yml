@@ -23,6 +23,7 @@ r_packages:
   - e1071
   - glmnet
   - rpart
+  - xgboost
   - randomForest
   - fastDummies
 

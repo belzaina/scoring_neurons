@@ -221,13 +221,13 @@ ui <- dashboardPage(
                             
                             tabPanel(
                                 
-                                title = "Linear Logistic Regression",
+                                title = "Gradient Boosting",
                                 
                                 br(),
                                 
-                                uiOutput("llr_eval_metrics"),
+                                uiOutput("gb_eval_metrics"),
                                 
-                                uiOutput("llr_var_imp"),
+                                uiOutput("gb_var_imp"),
                                 
                                 fluidRow(
                                     
@@ -243,63 +243,28 @@ ui <- dashboardPage(
                                             
                                             width = 6,
                                             
-                                            numericInput("llr_seed", label = h4("Seed"), value = 8081, min = 1),
+                                            numericInput("gb_seed", label = h4("Seed"), value = 8081, min = 1),
                                             
-                                            sliderInput("llr_fraction_train", label = h4("Fraction Used for Training"), 
+                                            sliderInput("gb_fraction_train", label = h4("Fraction Used for Training"), 
                                                         min = 0.1, max = 0.9, value = 0.7, step = 0.1),
                                             
+                                            numericInput("gb_nrounds", label = h4("Number of Rounds"), value = 1000, min = 10),
+                                            
+                                            numericInput("gb_early_stop", label = h4("Stop if no Improvement for ... Rounds"), value = 20, min = 10),
+                                            
+                                            numericInput("gb_nfolds", label = h4("CV Folds"), value = 5, min = 2),
+                                            
                                             radioButtons(
-                                                "llr_penalty", 
-                                                h4("Penalty"),
-                                                c("No Penalty"          = -1, 
-                                                  "Ridge"               = 0,
-                                                  "LASSO"               = 1)
+                                                "gb_var_imp", 
+                                                h4("Variable Importance Measure"),
+                                                c("Gain" = "Gain", 
+                                                  "Cover" = "Cover",
+                                                  "Frequency" = "Frequency")
                                             ),
                                             
                                             br(),
                                             
-                                            actionButton("llr_train_button", h4("Train & Test"), width = '100%')
-                                            
-                                        )
-                                        
-                                    )
-                                    
-                                )
-                                
-                            ),
-                            
-                            tabPanel(
-                                
-                                title = "Decision Trees",
-                                
-                                br(),
-                                
-                                uiOutput("dt_eval_metrics"),
-                                
-                                uiOutput("dt_var_imp"),
-                                
-                                fluidRow(
-                                    
-                                    column(
-                                        
-                                        offset = 3,
-                                        
-                                        width = 12,
-                                        
-                                        box(
-                                            
-                                            title = "TRAINING PARAMETERS",
-                                            
-                                            width = 6,
-                                            
-                                            numericInput("dt_seed", label = h4("Seed"), value = 8081, min = 1),
-                                            
-                                            sliderInput("dt_fraction_train", label = h4("Fraction Used for Training"), 
-                                                        min = 0.1, max = 0.9, value = 0.7, step = 0.1),
-                                            
-                                            br(),
-                                            
-                                            actionButton("dt_train_button", h4("Train & Test"), width = '100%')
+                                            actionButton("gb_train_button", h4("Train & Test"), width = '100%')
                                             
                                         )
                                         
@@ -359,13 +324,13 @@ ui <- dashboardPage(
                             
                             tabPanel(
                                 
-                                title = "Gradient Boosting",
+                                title = "Decision Trees",
                                 
                                 br(),
                                 
-                                uiOutput("gb_eval_metrics"),
+                                uiOutput("dt_eval_metrics"),
                                 
-                                uiOutput("bg_var_imp"),
+                                uiOutput("dt_var_imp"),
                                 
                                 fluidRow(
                                     
@@ -381,14 +346,63 @@ ui <- dashboardPage(
                                             
                                             width = 6,
                                             
-                                            numericInput("gb_seed", label = h4("Seed"), value = 8081, min = 1),
+                                            numericInput("dt_seed", label = h4("Seed"), value = 8081, min = 1),
                                             
-                                            sliderInput("gb_fraction_train", label = h4("Fraction Used for Training"), 
+                                            sliderInput("dt_fraction_train", label = h4("Fraction Used for Training"), 
                                                         min = 0.1, max = 0.9, value = 0.7, step = 0.1),
                                             
                                             br(),
                                             
-                                            actionButton("gb_train_button", h4("Train & Test"), width = '100%')
+                                            actionButton("dt_train_button", h4("Train & Test"), width = '100%')
+                                            
+                                        )
+                                        
+                                    )
+                                    
+                                )
+                                
+                            ),
+                            
+                            tabPanel(
+                                
+                                title = "Linear Logistic Regression",
+                                
+                                br(),
+                                
+                                uiOutput("llr_eval_metrics"),
+                                
+                                uiOutput("llr_var_imp"),
+                                
+                                fluidRow(
+                                    
+                                    column(
+                                        
+                                        offset = 3,
+                                        
+                                        width = 12,
+                                        
+                                        box(
+                                            
+                                            title = "TRAINING PARAMETERS",
+                                            
+                                            width = 6,
+                                            
+                                            numericInput("llr_seed", label = h4("Seed"), value = 8081, min = 1),
+                                            
+                                            sliderInput("llr_fraction_train", label = h4("Fraction Used for Training"), 
+                                                        min = 0.1, max = 0.9, value = 0.7, step = 0.1),
+                                            
+                                            radioButtons(
+                                                "llr_penalty", 
+                                                h4("Penalty"),
+                                                c("No Penalty"          = -1, 
+                                                  "Ridge"               = 0,
+                                                  "LASSO"               = 1)
+                                            ),
+                                            
+                                            br(),
+                                            
+                                            actionButton("llr_train_button", h4("Train & Test"), width = '100%')
                                             
                                         )
                                         
