@@ -61,7 +61,7 @@ gradient_boosting <- function(train_dataframe, test_dataframe, n_rounds = 1000,
     #' Variable Importance
     #'
     var_ranks <- xgboost::xgb.importance(model = xgb_fit) %>% 
-        dplyr::select("Feature", var_importance_measure) %>%
+        dplyr::select("Feature", dplyr::all_of(var_importance_measure)) %>%
         `colnames<-`(c("Predictor", "Importance")) %>%
         tibble::as_tibble()
     
