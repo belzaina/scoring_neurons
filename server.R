@@ -9,6 +9,7 @@ source("scripts/logistic_regression.R")
 source("scripts/compute_evaluation_criteria.R")
 source("scripts/random_forest.R")
 source("scripts/svm.R")
+source("scripts/decision_tree.R")
 
 
 #' Load Clean Credit Dataset
@@ -613,6 +614,201 @@ server <- function(input, output) {
                         icon     = icon("kickstarter-k"),
                         width    = 6,
                         color    = "blue"
+                        
+                    )
+                    
+                )
+                
+            ),
+            
+            fluidRow(
+                
+                column(
+                    
+                    width = 12,
+                    
+                    align = "center",
+                    
+                    h3("TRAIN AGAIN?"),
+                    
+                    br()
+                    
+                )
+                
+            )
+            
+        )
+        
+    })
+    
+    dt_results <- eventReactive(input$dt_train_button, {
+        
+        showModal(modalDialog("First it was a seed, then a stem, and then a growing tree...", 
+                              footer = icon("tree")))
+        
+        # Prepare Train & Test Sets
+        n_train   <- round(n_rows * input$dt_fraction_train)
+        set.seed(input$dt_seed)
+        i_train   <- sample(1:n_rows, size = n_train)
+        train_set <- credit_dataset_modeling[i_train, ]
+        test_set  <- credit_dataset_modeling[-i_train, ]
+        
+        results <- decision_tree(train_set, test_set)
+        
+        eval_metrics <- compute_evaluation_criteria(
+            test_set$DEFAULT %>% as.character() %>% as.numeric(), 
+            results[['Predicted_Y_Test_Prob']], 
+            results[['Predicted_Y_Test_Class']]
+        )
+        
+        removeModal()
+        
+        list(
+            
+            "eval_metrics" = eval_metrics,
+            
+            "var_ranks" = results[["var_ranks"]]
+            
+        )
+        
+    })
+    
+    output$dt_eval_metrics <- renderUI({
+        
+        eval_metrics <- dt_results()[["eval_metrics"]] %>% round(4)
+        
+        fluidRow(
+            
+            box(
+                
+                title = "TEST SET RESULTS",
+                
+                width = 12,
+                
+                valueBox(
+                    
+                    value    = eval_metrics$AUC,
+                    subtitle = "Area under the ROC Curve (AUC)",
+                    icon     = icon("chart-area"),
+                    width    = 4,
+                    color    = "blue"
+                    
+                ),
+                
+                valueBox(
+                    
+                    value    = eval_metrics$GINI,
+                    subtitle = "GINI",
+                    icon     = icon("goodreads-g"),
+                    width    = 4,
+                    color    = "blue"
+                    
+                ),
+                
+                valueBox(
+                    
+                    value    = eval_metrics$PCC,
+                    subtitle = "Percent of Correct Classifcation (PCC)",
+                    icon     = icon("product-hunt"),
+                    width    = 4,
+                    color    = "blue"
+                    
+                ),
+                
+                valueBox(
+                    
+                    value    = eval_metrics$BS,
+                    subtitle = "Brier Score (BS)",
+                    icon     = icon("bold"),
+                    width    = 4,
+                    color    = "blue"
+                    
+                ),
+                
+                valueBox(
+                    
+                    value    = eval_metrics$KS,
+                    subtitle = "Kolmogorov-Smirnov Statistic (KS)",
+                    icon     = icon("kickstarter-k"),
+                    width    = 4,
+                    color    = "blue"
+                    
+                ),
+                
+                valueBox(
+                    
+                    value    = dt_results()[["var_ranks"]] %>% nrow(),
+                    subtitle = "Selected Predictors",
+                    icon     = icon("tree"),
+                    width    = 4,
+                    color    = "blue"
+                    
+                )
+                
+            )
+            
+        )
+        
+    })
+    
+    output$dt_var_imp <- renderUI({
+        
+        var_ranks <- dt_results()[["var_ranks"]] %>%
+            dplyr::mutate_if(is.numeric, round, 4)
+        
+        div(
+            
+            fluidRow(
+                
+                box(
+                    
+                    title = "PREDICTORS IMPORTANCE",
+                    
+                    width = 6,
+                    
+                    renderPlot(
+                        
+                        var_ranks %>%
+                            dplyr::mutate(
+                                
+                                Predictor = factor(Predictor, levels = Predictor[order(Importance)])
+                                
+                            ) %>%
+                            ggplot(aes(x = Predictor, y = Importance)) +
+                            geom_bar(stat = "identity", fill = "#f68060", alpha = .6, width = .4) +
+                            coord_flip() +
+                            xlab("") +
+                            ylab("PREDICTOR IMPORTANCE") +
+                            theme_bw()
+                        
+                    )
+                    
+                ),
+                
+                box(
+                    
+                    title = "PREDICTORS IMPORTANCE - SORTED BY THE IMPORTANCE METRIC",
+                    
+                    width = 6,
+                    
+                    height = "467px",
+                    
+                    br(),
+                    
+                    DT::renderDataTable(
+                        
+                        var_ranks,
+                        
+                        class = "display nowrap",
+                        
+                        rownames= FALSE,
+                        
+                        options = list(
+                            
+                            scrollX = TRUE,
+                            pageLength = 5
+                            
+                        )
                         
                     )
                     

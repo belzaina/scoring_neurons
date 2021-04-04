@@ -205,7 +205,7 @@ ui <- dashboardPage(
                                             numericInput("nn_seed", label = h4("Seed"), value = 8081, min = 1),
                                             
                                             sliderInput("nn_fraction_train", label = h4("Fraction Used for Training"), 
-                                                        min = 0.1, max = 0.9, value = 0.5, step = 0.1),
+                                                        min = 0.1, max = 0.9, value = 0.7, step = 0.1),
                                             
                                             br(),
                                             
@@ -246,7 +246,7 @@ ui <- dashboardPage(
                                             numericInput("llr_seed", label = h4("Seed"), value = 8081, min = 1),
                                             
                                             sliderInput("llr_fraction_train", label = h4("Fraction Used for Training"), 
-                                                        min = 0.1, max = 0.9, value = 0.5, step = 0.1),
+                                                        min = 0.1, max = 0.9, value = 0.7, step = 0.1),
                                             
                                             radioButtons(
                                                 "llr_penalty", 
@@ -295,11 +295,11 @@ ui <- dashboardPage(
                                             numericInput("dt_seed", label = h4("Seed"), value = 8081, min = 1),
                                             
                                             sliderInput("dt_fraction_train", label = h4("Fraction Used for Training"), 
-                                                        min = 0.1, max = 0.9, value = 0.5, step = 0.1),
+                                                        min = 0.1, max = 0.9, value = 0.7, step = 0.1),
                                             
                                             br(),
                                             
-                                            actionButton("llr_train_button", h4("Train & Test"), width = '100%')
+                                            actionButton("dt_train_button", h4("Train & Test"), width = '100%')
                                             
                                         )
                                         
@@ -336,7 +336,7 @@ ui <- dashboardPage(
                                             numericInput("rf_seed", label = h4("Seed"), value = 8081, min = 1),
                                             
                                             sliderInput("rf_fraction_train", label = h4("Fraction Used for Training"), 
-                                                        min = 0.1, max = 0.9, value = 0.5, step = 0.1),
+                                                        min = 0.1, max = 0.9, value = 0.7, step = 0.1),
                                             
                                             radioButtons(
                                                 "rf_var_imp_metric", 
@@ -384,7 +384,7 @@ ui <- dashboardPage(
                                             numericInput("gb_seed", label = h4("Seed"), value = 8081, min = 1),
                                             
                                             sliderInput("gb_fraction_train", label = h4("Fraction Used for Training"), 
-                                                        min = 0.1, max = 0.9, value = 0.5, step = 0.1),
+                                                        min = 0.1, max = 0.9, value = 0.7, step = 0.1),
                                             
                                             br(),
                                             
@@ -423,7 +423,7 @@ ui <- dashboardPage(
                                             numericInput("svm_seed", label = h4("Seed"), value = 8081, min = 1),
                                             
                                             sliderInput("svm_fraction_train", label = h4("Fraction Used for Training"), 
-                                                        min = 0.1, max = 0.9, value = 0.5, step = 0.1),
+                                                        min = 0.1, max = 0.9, value = 0.7, step = 0.1),
                                             
                                             radioButtons(
                                                 "svm_kernel", 

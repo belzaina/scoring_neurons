@@ -22,6 +22,7 @@ r_packages:
   - purrr
   - e1071
   - glmnet
+  - rpart
   - randomForest
   - fastDummies
 
