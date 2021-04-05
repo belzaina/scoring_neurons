@@ -207,6 +207,12 @@ ui <- dashboardPage(
                                             sliderInput("nn_fraction_train", label = h4("Fraction Used for Training"), 
                                                         min = 0.1, max = 0.9, value = 0.7, step = 0.1),
                                             
+                                            numericInput('nn_hidden_size', label = h4('Number of Neurons in the Hidden Layer'), 
+                                                         value = 15, min = 1),
+                                            
+                                            numericInput('nn_max_iter', label = h4('Maximum Number of Iterations'), 
+                                                         value = 100, min = 1),
+                                            
                                             br(),
                                             
                                             actionButton("nn_train_button", h4("Train & Test"), width = '100%')

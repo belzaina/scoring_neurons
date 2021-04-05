@@ -26,6 +26,8 @@ r_packages:
   - xgboost
   - randomForest
   - fastDummies
+  - nnet
+  - NeuralNetTools
 
 apt_packages:
   - libgdal-dev

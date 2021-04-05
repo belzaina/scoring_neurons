@@ -11,6 +11,7 @@ source("scripts/random_forest.R")
 source("scripts/svm.R")
 source("scripts/decision_tree.R")
 source("scripts/gradient_boosting.R")
+source("scripts/neural_network.R")
 
 
 #' Load Clean Credit Dataset
@@ -1000,6 +1001,192 @@ server <- function(input, output) {
                     DT::renderDataTable(
                         
                         var_ranks,
+                        
+                        class = "display nowrap",
+                        
+                        rownames= FALSE,
+                        
+                        options = list(
+                            
+                            scrollX = TRUE,
+                            pageLength = 5
+                            
+                        )
+                        
+                    )
+                    
+                )
+                
+            ),
+            
+            fluidRow(
+                
+                column(
+                    
+                    width = 12,
+                    
+                    align = "center",
+                    
+                    h3("TRAIN AGAIN?"),
+                    
+                    br()
+                    
+                )
+                
+            )
+            
+        )
+        
+    })
+    
+    nn_results <- eventReactive(input$nn_train_button, {
+        
+        showModal(modalDialog("The brain is a machine, let's train it!", 
+                              footer = icon("brain")))
+        
+        # Prepare Train & Test Sets
+        n_train   <- round(n_rows * input$nn_fraction_train)
+        set.seed(input$nn_seed)
+        i_train   <- sample(1:n_rows, size = n_train)
+        train_set <- credit_dataset_modeling[i_train, ]
+        test_set  <- credit_dataset_modeling[-i_train, ]
+        
+        results <- neural_network(train_set, test_set, 
+                                  hidden_size = input$nn_hidden_size, max_iter = input$nn_max_iter)
+        
+        eval_metrics <- compute_evaluation_criteria(
+            test_set$DEFAULT %>% as.character() %>% as.numeric(), 
+            results[['Predicted_Y_Test_Prob']], 
+            results[['Predicted_Y_Test_Class']]
+        )
+        
+        removeModal()
+        
+        list(
+            
+            "eval_metrics" = eval_metrics,
+            
+            "var_ranks" = results[["var_ranks"]]
+            
+        )
+        
+    })
+    
+    output$nn_eval_metrics <- renderUI({
+        
+        eval_metrics <- nn_results()[["eval_metrics"]] %>% round(4)
+        
+        fluidRow(
+            
+            box(
+                
+                title = "TEST SET RESULTS",
+                
+                width = 12,
+                
+                valueBox(
+                    
+                    value    = eval_metrics$AUC,
+                    subtitle = "Area under the ROC Curve (AUC)",
+                    icon     = icon("chart-area"),
+                    width    = 4,
+                    color    = "blue"
+                    
+                ),
+                
+                valueBox(
+                    
+                    value    = eval_metrics$GINI,
+                    subtitle = "GINI",
+                    icon     = icon("goodreads-g"),
+                    width    = 4,
+                    color    = "blue"
+                    
+                ),
+                
+                valueBox(
+                    
+                    value    = eval_metrics$PCC,
+                    subtitle = "Percent of Correct Classifcation (PCC)",
+                    icon     = icon("product-hunt"),
+                    width    = 4,
+                    color    = "blue"
+                    
+                ),
+                
+                valueBox(
+                    
+                    value    = eval_metrics$BS,
+                    subtitle = "Brier Score (BS)",
+                    icon     = icon("bold"),
+                    width    = 6,
+                    color    = "blue"
+                    
+                ),
+                
+                valueBox(
+                    
+                    value    = eval_metrics$KS,
+                    subtitle = "Kolmogorov-Smirnov Statistic (KS)",
+                    icon     = icon("kickstarter-k"),
+                    width    = 6,
+                    color    = "blue"
+                    
+                )
+                
+            )
+            
+        )
+        
+    })
+    
+    output$nn_var_imp <- renderUI({
+        
+        var_ranks <- nn_results()[["var_ranks"]] %>%
+            dplyr::mutate_if(is.numeric, round, 4)
+        
+        div(
+            
+            fluidRow(
+                
+                box(
+                    
+                    title = "RELATIVE IMPORTANCE OF INPUT VARIABLES (Olden et al. 2004)",
+                    
+                    width = 6,
+                    
+                    renderPlot(
+                        
+                        var_ranks %>%
+                            dplyr::mutate(
+                                
+                                Predictor = factor(Predictor, levels = Predictor[order(Importance)])
+                                
+                            ) %>%
+                            ggplot(aes(x = Predictor, y = Importance)) +
+                            geom_bar(stat = "identity", fill = "#f68060", alpha = .6, width = .4) +
+                            coord_flip() +
+                            xlab("") +
+                            ylab("PREDICTOR IMPORTANCE") +
+                            theme_bw()
+                        
+                    )
+                    
+                ),
+                
+                box(
+                    
+                    title = "PREDICTORS IMPORTANCE TABLE",
+                    
+                    width = 6,
+                    
+                    height = "467px",
+                    
+                    br(),
+                    
+                    DT::renderDataTable(
+                        
+                        var_ranks %>% dplyr::arrange(desc(Importance)),
                         
                         class = "display nowrap",
                         
