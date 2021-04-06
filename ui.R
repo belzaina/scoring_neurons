@@ -19,6 +19,8 @@ ui <- dashboardPage(
             
             menuItem("MODELS TESTING", tabName = "models", icon = icon("chart-line")),
             
+            menuItem("DEFAULT ASSESSEMENT", tabName = "predict", icon = icon("microscope")),
+            
             menuItem("ABOUT", tabName = "about", icon = icon("at"))
             
         )
@@ -89,7 +91,7 @@ ui <- dashboardPage(
                             
                             tags$li("Train and test different learning algorithms in the context of credit scoring"),
                             
-                            tags$li("Perform robustness checking using N x 2-fold cross-validation")
+                            tags$li("Assess the default risk of a new client")
                             
                         ),
                         
@@ -459,6 +461,141 @@ ui <- dashboardPage(
                                         )
                                         
                                     )
+                                    
+                                )
+                                
+                            )
+                            
+                        )
+                        
+                    )
+                    
+                )
+                
+            ),
+            
+            tabItem(
+                
+                tabName = "about",
+                
+                br(),
+                
+                fluidRow(
+                    
+                    column(
+                        
+                        width = 12,
+                        
+                        align = "center",
+                        
+                        img(src = "Logo-couleur-MasterESA-RVB.jpg")
+                        
+                    )
+                    
+                ),
+                
+                br(), br(),
+                
+                fluidRow(
+                    
+                    box(
+                        
+                        width = 6,
+                        
+                        status = "primary",
+                        
+                        solidHeader = FALSE,
+                        
+                        style = "height: 280px;",
+                        
+                        title = ("About This Project"),
+                        
+                        markdown(
+                            
+                            "This project was conducted by [ZAINAB BELGADA](https://fr.linkedin.com/in/za%C3%AFnab-belgada-b1175b1ab) and [CLARISSE IRANKURIZA](https://www.linkedin.com/in/clarisse-irankuriza-54298b19b) under the supervision of Professor [ABDOUL AZIZ NDOYE](http://www.leo-univ-orleans.fr/fr/membres/#abdoul-aziz.ndoye@univ-orleans.fr) for 2021 [Master ESA](https://www.univ-orleans.fr/deg/masters/ESA/) Réseaux de Neurones class at [University of Orléans](https://www.univ-orleans.fr/fr/univ)."
+                            
+                        )
+                        
+                    ),
+                    
+                    box(
+                        
+                        title = "Developers",
+                        
+                        width = 6,
+                        
+                        status = "primary",
+                        
+                        solidHeader = FALSE,
+                        
+                        style = "height: 280px;",
+                        
+                        br(),
+                        
+                        fluidRow(
+                            
+                            column(
+                                
+                                width = 6, 
+                                
+                                align = "center",
+                                
+                                img(
+                                    
+                                    class = "img-responsive img-rounded center-block", 
+                                    
+                                    src = "zainab_belgada.jpg"
+                                    
+                                ),
+                                
+                                br(),
+                                
+                                p(
+                                    
+                                    span(icon("envelope"), HTML('&nbsp;'), 
+                                         "zainab.belgada@etu.univ-orleans.fr"),
+                                    
+                                    style = "font-size: 15px;"
+                                    
+                                ),
+                                
+                                p(
+                                    
+                                    a(icon("linkedin", "fa-2x"), HTML('&nbsp;'), HTML('&nbsp;'), href = "https://fr.linkedin.com/in/za%C3%AFnab-belgada-b1175b1ab"),
+                                    a(icon("github", "fa-2x"), href = "https://github.com/belzaina", style = "color: inherit;")
+                                    
+                                )
+                                
+                            ),
+                            
+                            column(
+                                
+                                width = 6, 
+                                
+                                align = "center",
+                                
+                                img(
+                                    
+                                    class = "img-responsive img-rounded center-block", 
+                                    
+                                    src = "clarisse_irankuriza.jpg"
+                                    
+                                ),
+                                
+                                br(),
+                                
+                                p(
+                                    
+                                    span(icon("envelope"), HTML('&nbsp;'), 
+                                         "irankclara@gmail.com"),
+                                    
+                                    style = "font-size: 15px;"
+                                    
+                                ),
+                                
+                                p(
+                                    
+                                    a(icon("linkedin", "fa-2x"), href = "https://www.linkedin.com/in/clarisse-irankuriza-54298b19b")
                                     
                                 )
                                 
