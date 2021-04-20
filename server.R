@@ -51,6 +51,31 @@ missing_values <- round(100 * sum(is.na(credit_dataset_eda)) / (n_rows * n_cols)
 variable_names <- sort(colnames(credit_dataset_eda), decreasing = TRUE)
 
 
+#' Models Performance Summary
+#'
+summary_tibble <- dplyr::tibble(
+    
+    Learning_Algo = c(
+        "NN, 5 NEURONS",
+        "NN, 10 NEURONS",
+        "NN, 15 NEURONS",
+        "LINEAR LR",
+        "LINEAR LR (RIDGE)",
+        "LINEAR LR (LASSO)",
+        "DECISION TREE",
+        "RANDOM FOREST",
+        "GRADIENT BOOSTING",
+        "SVM (RADIAL)",
+        "SVM (POLYNOMIAL)"
+    ),
+    
+    AUC = c(0.7713, 0.7764, 0.7704, 0.7597, 0.7606, 0.7597, 0.6446, 0.7653, 0.7792, 0.6391, 0.635),
+    
+    PCC = c(0.8183, 0.8176, 0.8171, 0.8201, 0.8083, 0.8189, 0.8213, 0.8186, 0.8226, 0.7799, 0.7814)
+    
+)
+
+
 server <- function(input, output) {
     
     output$n_rows <- renderText(n_rows)
@@ -1222,6 +1247,23 @@ server <- function(input, output) {
             )
             
         )
+        
+    })
+    
+    output$summary_results_auc <- renderPlot({
+        
+        summary_tibble %>%
+            dplyr::mutate(
+                Learning_Algo = factor(Learning_Algo, levels = Learning_Algo[order(AUC)])
+            ) %>%
+            ggplot(aes(x = Learning_Algo, y = AUC)) +
+            geom_bar(stat = "identity", fill = "#f68060", alpha = .6, width = .7) +
+            coord_flip() +
+            xlab("") +
+            ylab("AUC") +
+            geom_text(aes(label = round(AUC, 3), hjust = 1.2), color = "darkblue", size = 5) +
+            theme_bw() +
+            theme(axis.text = element_text(size=12, face = "bold"), axis.title.x = element_text(size=16))
         
     })
     

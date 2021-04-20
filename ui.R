@@ -19,7 +19,7 @@ ui <- dashboardPage(
             
             menuItem("MODELS TESTING", tabName = "models", icon = icon("chart-line")),
             
-            menuItem("DEFAULT ASSESSEMENT", tabName = "predict", icon = icon("microscope")),
+            menuItem("PERFORMANCE SUMMARY", tabName = "summary", icon = icon("poll-h")),
             
             menuItem("ABOUT", tabName = "about", icon = icon("at"))
             
@@ -91,7 +91,7 @@ ui <- dashboardPage(
                             
                             tags$li("Train and test different learning algorithms in the context of credit scoring"),
                             
-                            tags$li("Assess the default risk of a new client")
+                            tags$li("Summarize and compare the performance of different learning algorithms.")
                             
                         ),
                         
@@ -600,6 +600,36 @@ ui <- dashboardPage(
                                 )
                                 
                             )
+                            
+                        )
+                        
+                    )
+                    
+                )
+                
+            ),
+            
+            tabItem(
+                
+                tabName = "summary",
+                
+                fluidRow(
+                    
+                    box(
+                        
+                        title = p("Ranking Performance by AUC:", style = "font-size:28px"),
+                        
+                        br(),
+                        
+                        width = 12,
+                        
+                        column(
+                            
+                            width = 6,
+                            
+                            offset = 3,
+                            
+                            plotOutput("summary_results_auc")
                             
                         )
                         
